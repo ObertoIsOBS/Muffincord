@@ -10,5 +10,10 @@
     "discord"
   ],
   "author": "OBSCode",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "fs": "0.0.1-security",
+    "uuid-int": "^3.0.3"
+  }
 }
