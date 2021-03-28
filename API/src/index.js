@@ -111,7 +111,9 @@ api.put("users/me/friends/:id", async (req, res) => {
 
     var user = authorized.user;
 
-    user.friends.push(req.query.id);
+    var toFriend = await require("../models/User").findOne({id: req.query.id});
+
+    user.friends.push(toFriend);
 
     await user.save();
 
@@ -136,7 +138,7 @@ api.delete("users/me/friends/:id", async (req, res) => {
 
     var user = authorized.user;
 
-    user.friends = user.friends.filter(u => u !== req.query.id);
+    user.friends = user.friends.filter(u => u.id !== req.query.id);
 
     await user.save();
 
@@ -168,13 +170,13 @@ api.put("users/me/friends/requests/:id", async (req, res) => {
 
     if (!toRequest.acceptingFriends) return res.sendStatus(403);
 
-    user.requests.outgoing.push(req.query.id);
+    user.requests.outgoing.push(toRequest);
 
     await user.save();
 
     var toRequestClient = await require("../models/ClientUser").findOne({id: req.query.id});
 
-    toRequestClient.requests.incoming.push(user.id);
+    toRequestClient.requests.incoming.push(user);
 
     await toRequestClient.save();
 
@@ -203,17 +205,134 @@ api.delete("users/me/friends/requests/:type/:id", async (req, res) => {
 
     if (!toRequest) return res.sendStatus(404);
 
-    user.requests[req.query.type] = user.requests[req.query.type].filter(u => u !== req.query.id);
+    user.requests[req.query.type] = user.requests[req.query.type].filter(u => u.id !== req.query.id);
 
     await user.save();
 
     var toRequestClient = await require("../models/ClientUser").findOne({id: req.query.id});
 
-    toRequestClient.requests[req.query.type] = toRequestClient.requests[req.query.type].filter(u => u !== req.query.id);
+    toRequestClient.requests[req.query.type] = toRequestClient.requests[req.query.type].filter(u => u.id !== req.query.id);
 
     await toRequestClient.save();
 
     res.send(200);
+    
+})
+
+api.get("/users/me/groups/:id", async (req, res) => {
+    const authorization = req.headers.authorization;
+
+    if (RL.has({token: authorization, path: req.url})) return res.sendStatus(429);
+
+    RL.add({token: authorization, path: req.url});
+
+    setTimeout(() => {
+        RL.delete({token: authorization, path: req.url});
+    }, 500);
+
+    var authorized = await tokens.findOne({token: authorization});
+
+    if (!authorized) return res.sendStatus(401);
+
+    const user = authorized.user;
+
+    if (!user.groups.length) return res.sendStatus(404);
+
+    res.json(user.groups);
+
+})
+
+api.put("/users/me/groups/:id", async (req, res) => {
+    const authorization = req.headers.authorization;
+
+    if (RL.has({token: authorization, path: req.url})) return res.sendStatus(429);
+
+    RL.add({token: authorization, path: req.url});
+
+    setTimeout(() => {
+        RL.delete({token: authorization, path: req.url});
+    }, 500);
+
+    var authorized = await tokens.findOne({token: authorization});
+
+    if (!authorized) return res.sendStatus(401);
+
+    const user = authorized.user;
+
+    var group = await require("../models/GroupChat").findOne({id: req.query.id});
+
+    if (!group) return res.sendStatus(404);
+
+    group.members.push(user);
+
+    await group.save();
+
+    res.sendStatus(200);
+
+})
+
+api.delete("/users/me/groups/:id", async (req, res) => {
+    const authorization = req.headers.authorization;
+
+    if (RL.has({token: authorization, path: req.url})) return res.sendStatus(429);
+
+    RL.add({token: authorization, path: req.url});
+
+    setTimeout(() => {
+        RL.delete({token: authorization, path: req.url});
+    }, 500);
+
+    var authorized = await tokens.findOne({token: authorization});
+
+    if (!authorized) return res.sendStatus(401);
+
+    const user = authorized.user;
+
+    var group = await require("../models/GroupChat").findOne({id: req.query.id});
+
+    if (!group) return res.sendStatus(404);
+
+    if (!group.members.find(m => m.id === user.id)) return res.sendStatus(403);
+
+    group.members = group.members.filter(m => m.id !== user.id);
+
+    await group.save();
+
+    res.sendStatus(200);
+    
+});
+
+
+
+
+
+/* Group Chats */
+api.put("/groups", async (req, res) => {
+    const authorization = req.headers.authorization;
+
+    if (RL.has({token: authorization, path: req.url})) return res.sendStatus(429);
+
+    RL.add({token: authorization, path: req.url});
+
+    setTimeout(() => {
+        RL.delete({token: authorization, path: req.url});
+    }, 500);
+
+    var authorized = await tokens.findOne({token: authorization});
+
+    if (!authorized) return res.sendStatus(401);
+
+    const user = authorized.user;
+
+    const Identifier = require("../classes/Identifier");
+
+    const id = new Identifier();
+
+    const groupChat = new require("../models/GroupChat")({ id: id, members: [user.id], owner: user, created: new Date() });
+
+    await groupChat.save();
+
+    res.sendStatus(200);
     
 })
 
