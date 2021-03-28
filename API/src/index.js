@@ -32,7 +32,7 @@ api.get("/users/:id", async (req, res) => {
 
     if (!authorized) return res.sendStatus(401);
 
-    const user = await require("../models/User").findOne({id: req.query.id});
+    const user = await require("../models/User").findOne({id: req.params.id});
 
     if (!user) return res.sendStatus(404);
 
@@ -81,7 +81,7 @@ api.patch("/users/me/settings/:setting", async (req, res) => {
 
     var user = authorized.user;
 
-    const setting = req.query.setting;
+    const setting = req.params.setting;
 
     if (!user[setting]) return res.sendStatus(404);
 
@@ -111,7 +111,7 @@ api.put("users/me/friends/:id", async (req, res) => {
 
     var user = authorized.user;
 
-    var toFriend = await require("../models/User").findOne({id: req.query.id});
+    var toFriend = await require("../models/User").findOne({id: req.params.id});
 
     user.friends.push(toFriend);
 
@@ -138,7 +138,7 @@ api.delete("users/me/friends/:id", async (req, res) => {
 
     var user = authorized.user;
 
-    user.friends = user.friends.filter(u => u.id !== req.query.id);
+    user.friends = user.friends.filter(u => u.id !== req.params.id);
 
     await user.save();
 
@@ -164,7 +164,7 @@ api.put("users/me/friends/requests/:id", async (req, res) => {
 
     var user = authorized.user;
 
-    var toRequest = await require("../models/User").findOne({id: req.query.id});
+    var toRequest = await require("../models/User").findOne({id: req.params.id});
 
     if (!toRequest) return res.sendStatus(404);
 
@@ -174,7 +174,7 @@ api.put("users/me/friends/requests/:id", async (req, res) => {
 
     await user.save();
 
-    var toRequestClient = await require("../models/ClientUser").findOne({id: req.query.id});
+    var toRequestClient = await require("../models/ClientUser").findOne({id: req.params.id});
 
     toRequestClient.requests.incoming.push(user);
 
@@ -201,17 +201,17 @@ api.delete("users/me/friends/requests/:type/:id", async (req, res) => {
 
     var user = authorized.user;
 
-    var toRequest = await require("../models/User").findOne({id: req.query.id});
+    var toRequest = await require("../models/User").findOne({id: req.params.id});
 
     if (!toRequest) return res.sendStatus(404);
 
-    user.requests[req.query.type] = user.requests[req.query.type].filter(u => u.id !== req.query.id);
+    user.requests[req.params.type] = user.requests[req.params.type].filter(u => u.id !== req.params.id);
 
     await user.save();
 
-    var toRequestClient = await require("../models/ClientUser").findOne({id: req.query.id});
+    var toRequestClient = await require("../models/ClientUser").findOne({id: req.params.id});
 
-    toRequestClient.requests[req.query.type] = toRequestClient.requests[req.query.type].filter(u => u.id !== req.query.id);
+    toRequestClient.requests[req.params.type] = toRequestClient.requests[req.params.type].filter(u => u.id !== req.params.id);
 
     await toRequestClient.save();
 
@@ -259,7 +259,7 @@ api.put("/users/me/groups/:id", async (req, res) => {
 
     const user = authorized.user;
 
-    var group = await require("../models/GroupChat").findOne({id: req.query.id});
+    var group = await require("../models/GroupChat").findOne({id: req.params.id});
 
     if (!group) return res.sendStatus(404);
 
@@ -288,7 +288,7 @@ api.delete("/users/me/groups/:id", async (req, res) => {
 
     const user = authorized.user;
 
-    var group = await require("../models/GroupChat").findOne({id: req.query.id});
+    var group = await require("../models/GroupChat").findOne({id: req.params.id});
 
     if (!group) return res.sendStatus(404);
 
