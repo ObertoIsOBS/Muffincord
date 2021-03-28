@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Identifier = require("../classes/Identifier");
+const User = require("./User");
 
 const schema = new mongoose.Schema({
     _id: mongoose.Types.ObjectId,
@@ -8,6 +9,7 @@ const schema = new mongoose.Schema({
     channels: Array,
     roles: Array,
     name: String,
+    owner: User,
     created: Date
 })
 
