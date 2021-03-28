@@ -15,6 +15,8 @@ const schema = new mongoose.Schema({
         incoming: Array,
         outgoing: Array
     },
+    groups: Array,
+    guilds: Array,
     emailVerified: Boolean
 })
 
