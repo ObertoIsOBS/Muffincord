@@ -7,7 +7,8 @@ const schema = new mongoose.Schema({
     username: String,
     discriminator: Number,
     created: Date,
-    status: Number
+    status: Number,
+    acceptingFriends: Boolean
 })
 
 exports = mongoose.model("User", schema);

@@ -6,9 +6,15 @@ const schema = new mongoose.Schema({
     id: Identifier,
     username: String,
     discriminator: Number,
+    acceptingFriends: Boolean,
     created: Date,
     password: String,
     email: String,
+    friends: Array,
+    requests: {
+        incoming: Array,
+        outgoing: Array
+    },
     emailVerified: Boolean
 })
 
