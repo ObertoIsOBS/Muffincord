@@ -7,6 +7,7 @@ const schema = new mongoose.Schema({
     members: Array,
     channels: Array,
     roles: Array,
+    name: String,
     created: Date
 })
 

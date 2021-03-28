@@ -6,6 +6,7 @@ const schema = new mongoose.Schema({
     _id: mongoose.Types.ObjectId,
     id: Identifier,
     type: Number,
+    name: String,
     messages: Array,
     members: Array,
     permissions: Number,
